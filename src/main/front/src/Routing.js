@@ -1,6 +1,7 @@
 import React from "react";
 import {Route, Routes} from "react-router-dom";
 import ProjectMain from "./views/MainPage";
+import CafeteriaList from "./views/CafeteriaList";
 
 export default function Routing(){
     return (
@@ -8,6 +9,7 @@ export default function Routing(){
             <div style={{ marginTop: '64px' }}>
                 <Routes>
                     <Route path='/' element={<ProjectMain/>} />
+                    <Route path='/cafeteria' element={<CafeteriaList/>} />
                 </Routes>
             </div>
         </div>
