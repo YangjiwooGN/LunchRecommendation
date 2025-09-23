@@ -17,16 +17,15 @@ public class CafeteriaController {
         this.service = service;
     }
 
-    // ✅ 캐시된 최신 결과 조회 (매일 11시에 자동 갱신됨)
+    // ✅ 요청 시점 기준으로 당일 메뉴 반환
     @GetMapping
     public ResponseEntity<List<CafeteriaDto>> list() {
-        return ResponseEntity.ok(service.getCached());
+        return ResponseEntity.ok(service.getTodayMenus());
     }
 
-    // ✅ 수동으로 즉시 크롤링 실행 (개발/디버그용)
+    // ✅ 강제로 새 크롤링 (디버그용)
     @PostMapping("/crawl")
     public ResponseEntity<List<CafeteriaDto>> crawlNow() {
-        List<CafeteriaDto> latest = service.crawlTodayPosts();
-        return ResponseEntity.ok(latest);
+        return ResponseEntity.ok(service.crawlTodayPosts());
     }
 }
