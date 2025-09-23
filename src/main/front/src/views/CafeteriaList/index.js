@@ -4,7 +4,7 @@ function CafeteriaList() {
     const [items, setItems] = useState([]);
 
     useEffect(() => {
-        fetch("/api/cafeterias")
+        fetch("http://localhost:8080/api/cafeterias")
             .then((r) => r.json())
             .then(setItems)
             .catch(console.error);
