@@ -17,13 +17,13 @@ public class CafeteriaController {
         this.service = service;
     }
 
-    // ✅ 요청 시점 기준으로 당일 메뉴 반환
+    // ✅ 요청 시점 기준으로 캐시 반환 (11시마다 자동 갱신)
     @GetMapping
     public ResponseEntity<List<CafeteriaDto>> list() {
         return ResponseEntity.ok(service.getTodayMenus());
     }
 
-    // ✅ 강제로 새 크롤링 (디버그용)
+    // ✅ 강제로 새 크롤링 (디버그/테스트용)
     @PostMapping("/crawl")
     public ResponseEntity<List<CafeteriaDto>> crawlNow() {
         return ResponseEntity.ok(service.crawlTodayPosts());
