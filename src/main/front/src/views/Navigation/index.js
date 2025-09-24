@@ -49,7 +49,7 @@ export default function Navigation(){
                     <Button
                         variant="contained"
                         sx={naviButtonStyle}
-                        onClick={() => navigate("/kibana")}
+                        onClick={() => navigate("/cafeteria")}
                     >
                         구내식당 메뉴
                     </Button>
