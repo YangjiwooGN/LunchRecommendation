@@ -65,13 +65,6 @@ export default function Navigation() {
                     <Button
                         variant="contained"
                         sx={naviButtonStyle}
-                        onClick={() => navigate("/grafana")}
-                    >
-                        게시판
-                    </Button>
-                    <Button
-                        variant="contained"
-                        sx={naviButtonStyle}
                         onClick={() => navigate("/ai")}
                     >
                         AI
