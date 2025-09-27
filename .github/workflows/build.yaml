@@ -12,38 +12,40 @@ env:
   KUSTOMIZE_PATH: base
 
 jobs:
+  # ✅ 1) 백엔드 이미지 빌드 & 푸시
   build-backend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Login Docker Hub
+      - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           registry: docker.io
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build & Push backend
+      - name: Build & Push Backend Image
         run: |
           docker build -f Dockerfile.backend -t $IMAGE_BACKEND:${{ github.sha }} .
           docker tag  $IMAGE_BACKEND:${{ github.sha }} $IMAGE_BACKEND:latest
           docker push $IMAGE_BACKEND:${{ github.sha }}
           docker push $IMAGE_BACKEND:latest
 
+  # ✅ 2) 프론트엔드 이미지 빌드 & 푸시
   build-frontend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Login Docker Hub
+      - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           registry: docker.io
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build & Push frontend
+      - name: Build & Push Frontend Image
         run: |
           docker build -f Dockerfile.frontend \
             --build-arg REACT_APP_API_BASE="${{ secrets.REACT_APP_API_BASE || '/api' }}" \
@@ -52,11 +54,12 @@ jobs:
           docker push $IMAGE_FRONTEND:${{ github.sha }}
           docker push $IMAGE_FRONTEND:latest
 
+  # ✅ 3) GitOps 레포 업데이트 (ArgoCD가 자동 배포)
   update-gitops:
     needs: [ build-backend, build-frontend ]
     runs-on: ubuntu-latest
     steps:
-      - name: Clone gitops repo
+      - name: Clone GitOps repo
         uses: actions/checkout@v4
         with:
           repository: ${{ env.GITOPS_REPO }}
@@ -78,22 +81,20 @@ jobs:
           cd gitops/${{ env.KUSTOMIZE_PATH }}
 
           echo "🔄 Updating backend image to $IMAGE_BACKEND:$GITHUB_SHA"
-          yq -i "
-            .images[] |= 
-              (if .name == \"$IMAGE_BACKEND\" then .newTag = \"$GITHUB_SHA\" else . end)
-          " kustomization.yaml
+          yq -i '
+            .images[] |= (if .name == env(IMAGE_BACKEND) then .newTag = env(GITHUB_SHA) else . end)
+          ' kustomization.yaml
 
           echo "🔄 Updating frontend image to $IMAGE_FRONTEND:$GITHUB_SHA"
-          yq -i "
-            .images[] |= 
-              (if .name == \"$IMAGE_FRONTEND\" then .newTag = \"$GITHUB_SHA\" else . end)
-          " kustomization.yaml
+          yq -i '
+            .images[] |= (if .name == env(IMAGE_FRONTEND) then .newTag = env(GITHUB_SHA) else . end)
+          ' kustomization.yaml
 
-      - name: Commit & push
+      - name: Commit & Push changes
         run: |
           cd gitops
           git config user.name "YangjiwooGN"
           git config user.email "jwoo3460@gmail.com"
           git add -A
-          git commit -m "Update images to $GITHUB_SHA" || echo "No changes"
+          git commit -m "Update images to $GITHUB_SHA" || echo "No changes to commit"
           git push
