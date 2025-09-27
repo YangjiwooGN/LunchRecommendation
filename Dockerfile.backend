@@ -7,13 +7,16 @@ RUN ./gradlew bootJar -x test
 
 # ---------- run (with chromium) ----------
 FROM eclipse-temurin:21-jre-jammy
-# 필요한 패키지(크롬/드라이버/폰트)
+# ✅ Chrome 설치
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-      chromium chromium-driver fonts-noto-cjk ca-certificates wget && \
+    apt-get install -y wget gnupg ca-certificates fonts-noto-cjk && \
+    wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
+    echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list && \
+    apt-get update && \
+    apt-get install -y google-chrome-stable && \
     rm -rf /var/lib/apt/lists/*
-ENV CHROME_BIN=/usr/bin/chromium
-ENV WEBDRIVER_CHROME_DRIVER=/usr/bin/chromedriver
+
+ENV CHROME_BIN=/usr/bin/google-chrome
 
 WORKDIR /app
 COPY --from=build /app/build/libs/*.jar /app/app.jar
