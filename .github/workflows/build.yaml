@@ -63,8 +63,9 @@ jobs:
           token: ${{ secrets.GITOPS_TOKEN }}
           path: gitops
 
-      - name: Install yq
-        run: sudo snap install yq
+      - name: Install yq (v4)
+        run: |
+          sudo snap install yq --channel=v4/stable
 
       - name: Update image tags in kustomization.yaml
         env:
