@@ -28,6 +28,13 @@ export default function CafeteriaList() {
     const [touchStartX, setTouchStartX] = useState(null);
 
     useEffect(() => {
+        const now = new Date();
+        const currentHour = now.getHours();
+        if (currentHour < 11) {
+            setLoading(false); // 로딩 상태 해제만 하고 API는 호출하지 않음
+            return;
+        }
+
         fetch(`${API_BASE}/cafeterias`)
             .then((r) => r.json())
             .then((data) => {
