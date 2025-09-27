@@ -29,7 +29,7 @@ export default function CafeteriaList() {
     const [touchStartX, setTouchStartX] = useState(null);
 
     useEffect(() => {
-        fetch(`${API_BASE}/cafeterias`)
+        fetch(`${API_BASE}/api/cafeterias`)
             .then((r) => r.json())
             .then((data) => {
                 // ✅ 우선순위 식당 이름 리스트
