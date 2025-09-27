@@ -81,14 +81,14 @@ jobs:
           cd gitops/${{ env.KUSTOMIZE_PATH }}
 
           echo "🔄 Updating backend image to $IMAGE_BACKEND:$GITHUB_SHA"
-          yq -i '
-            .images[] |= (if .name == env(IMAGE_BACKEND) then .newTag = env(GITHUB_SHA) else . end)
-          ' kustomization.yaml
+          yq -i "
+            .images[] |= (if .name == \"$IMAGE_BACKEND\" then .newTag = \"$GITHUB_SHA\" else . end)
+          " kustomization.yaml
 
           echo "🔄 Updating frontend image to $IMAGE_FRONTEND:$GITHUB_SHA"
-          yq -i '
-            .images[] |= (if .name == env(IMAGE_FRONTEND) then .newTag = env(GITHUB_SHA) else . end)
-          ' kustomization.yaml
+          yq -i "
+            .images[] |= (if .name == \"$IMAGE_FRONTEND\" then .newTag = \"$GITHUB_SHA\" else . end)
+          " kustomization.yaml
 
       - name: Commit & Push changes
         run: |
