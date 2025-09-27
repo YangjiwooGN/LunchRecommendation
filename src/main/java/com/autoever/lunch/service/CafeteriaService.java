@@ -12,6 +12,10 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -108,6 +112,12 @@ public class CafeteriaService {
             return Collections.emptyList();
         } finally {
             try { driver.quit(); } catch (Exception ignore) {}
+            try {
+                Files.walk(Paths.get("/tmp"))
+                        .sorted(Comparator.reverseOrder())
+                        .map(Path::toFile)
+                        .forEach(File::delete);
+            } catch (Exception ignore) {}
         }
     }
 
