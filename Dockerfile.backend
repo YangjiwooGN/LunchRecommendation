@@ -1,11 +1,22 @@
+# ---------- build ----------
 FROM gradle:8.7-jdk21 AS build
 WORKDIR /app
 COPY . .
 RUN chmod +x gradlew
 RUN ./gradlew bootJar -x test
 
-FROM eclipse-temurin:21-jre-jammy
-WORKDIR /app
-COPY --from=build /app/build/libs/*.jar app.jar
+# ---------- run (with chromium) ----------
+FROM eclipse-temurin:21-jre-bookworm
+# 필요한 패키지(크롬/드라이버/폰트)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      chromium chromium-driver fonts-noto-cjk ca-certificates wget && \
+    rm -rf /var/lib/apt/lists/*
+ENV CHROME_BIN=/usr/bin/chromium
+ENV WEBDRIVER_CHROME_DRIVER=/usr/bin/chromedriver
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+WORKDIR /app
+COPY --from=build /app/build/libs/*.jar /app/app.jar
+
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","/app/app.jar"]

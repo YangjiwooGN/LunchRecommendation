@@ -55,7 +55,7 @@ jobs:
       - name: Build & Push Frontend Image
         run: |
           docker build -f Dockerfile.frontend \
-            --build-arg REACT_APP_API_BASE=${{ secrets.REACT_APP_API_BASE }} \
+            --build-arg REACT_APP_API_BASE="/api" \
             -t $IMAGE_FRONTEND:${{ github.sha }} .
           docker tag  $IMAGE_FRONTEND:${{ github.sha }} $IMAGE_FRONTEND:latest
           docker push $IMAGE_FRONTEND:${{ github.sha }}
