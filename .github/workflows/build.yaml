@@ -53,7 +53,7 @@ jobs:
           docker push $IMAGE_FRONTEND:latest
 
   update-gitops:
-    needs: [build-backend, build-frontend]
+    needs: [ build-backend, build-frontend ]
     runs-on: ubuntu-latest
     steps:
       - name: Clone gitops repo
@@ -64,16 +64,27 @@ jobs:
           path: gitops
 
       - name: Install yq
-        run: sudo apt-get update && sudo apt-get install -y yq
+        run: sudo snap install yq
 
       - name: Update image tags in kustomization.yaml
         env:
           IMAGE_BACKEND: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/lunch-backend
           IMAGE_FRONTEND: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/lunch-frontend
+          GITHUB_SHA: ${{ github.sha }}
         run: |
           cd gitops/${{ env.KUSTOMIZE_PATH }}
-          yq -y -i '.images[] |= select(.name == env.IMAGE_BACKEND).newTag = env.GITHUB_SHA' kustomization.yaml
-          yq -y -i '.images[] |= select(.name == env.IMAGE_FRONTEND).newTag = env.GITHUB_SHA' kustomization.yaml
+
+          # backend 이미지 업데이트
+          yq -i '
+            .images[] |= 
+              (if .name == strenv(IMAGE_BACKEND) then .newTag = strenv(GITHUB_SHA) else . end)
+          ' kustomization.yaml
+
+          # frontend 이미지 업데이트
+          yq -i '
+            .images[] |= 
+              (if .name == strenv(IMAGE_FRONTEND) then .newTag = strenv(GITHUB_SHA) else . end)
+          ' kustomization.yaml
 
       - name: Commit & push
         run: |
