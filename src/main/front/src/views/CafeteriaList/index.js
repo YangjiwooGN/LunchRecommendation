@@ -20,6 +20,7 @@ export default function CafeteriaList() {
     const [loading, setLoading] = useState(true);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [modalImage, setModalImage] = useState(null);
+    const API_BASE = process.env.REACT_APP_API_BASE || "/api";
 
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // ✅ 600px 이하
@@ -28,7 +29,7 @@ export default function CafeteriaList() {
     const [touchStartX, setTouchStartX] = useState(null);
 
     useEffect(() => {
-        fetch("http://localhost:8080/api/cafeterias")
+        fetch(`${API_BASE}/cafeterias`)
             .then((r) => r.json())
             .then((data) => {
                 // ✅ 우선순위 식당 이름 리스트
