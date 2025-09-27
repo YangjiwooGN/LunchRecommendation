@@ -68,6 +68,7 @@ jobs:
 
       - name: Install yq (v4)
         run: |
+          sudo rm -f /usr/bin/yq || true
           wget https://github.com/mikefarah/yq/releases/download/v4.44.2/yq_linux_amd64 -O /usr/local/bin/yq
           chmod +x /usr/local/bin/yq
           yq --version
@@ -82,12 +83,12 @@ jobs:
 
           echo "🔄 Updating backend image to $IMAGE_BACKEND:$GITHUB_SHA"
           yq -i "
-            .images[] |= (if .name == \"$IMAGE_BACKEND\" then .newTag = \"$GITHUB_SHA\" else . end)
+            (.images[] | select(.name == \"$IMAGE_BACKEND\")).newTag = \"$GITHUB_SHA\"
           " kustomization.yaml
 
           echo "🔄 Updating frontend image to $IMAGE_FRONTEND:$GITHUB_SHA"
           yq -i "
-            .images[] |= (if .name == \"$IMAGE_FRONTEND\" then .newTag = \"$GITHUB_SHA\" else . end)
+            (.images[] | select(.name == \"$IMAGE_FRONTEND\")).newTag = \"$GITHUB_SHA\"
           " kustomization.yaml
 
       - name: Commit & Push changes
@@ -96,5 +97,5 @@ jobs:
           git config user.name "YangjiwooGN"
           git config user.email "jwoo3460@gmail.com"
           git add -A
-          git commit -m "Update images to $GITHUB_SHA" || echo "No changes to commit"
+          git commit -m "Update images to $GITHUB_SHA" || echo "✅ No changes to commit"
           git push
