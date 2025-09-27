@@ -72,8 +72,8 @@ jobs:
           IMAGE_FRONTEND: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/lunch-frontend
         run: |
           cd gitops/${{ env.KUSTOMIZE_PATH }}
-          yq -i '.images[] |= select(.name == env.IMAGE_BACKEND).newTag = env.GITHUB_SHA' kustomization.yaml
-          yq -i '.images[] |= select(.name == env.IMAGE_FRONTEND).newTag = env.GITHUB_SHA' kustomization.yaml
+          yq -y -i '.images[] |= select(.name == env.IMAGE_BACKEND).newTag = env.GITHUB_SHA' kustomization.yaml
+          yq -y -i '.images[] |= select(.name == env.IMAGE_FRONTEND).newTag = env.GITHUB_SHA' kustomization.yaml
 
       - name: Commit & push
         run: |
