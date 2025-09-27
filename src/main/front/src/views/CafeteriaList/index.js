@@ -56,7 +56,27 @@ export default function CafeteriaList() {
             });
     }, []);
 
+    // 현재 시간 체크
+    const now = new Date();
+    const currentHour = now.getHours();
+    const isBefore11 = currentHour < 11;
+
     if (loading) return <Typography align="center">로딩 중...</Typography>;
+
+    // 아침 11시 전이고, 데이터가 아직 없을 때 → 안내 문구만 표시
+    if (isBefore11 && items.length === 0) {
+        return (
+            <Container maxWidth="sm" sx={{ py: 10, textAlign: "center" }}>
+                <Typography variant="h4" fontWeight="bold" gutterBottom>
+                    🍱 매일 오전 11시에 최신화됩니다
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                    현재는 식당 데이터가 준비되지 않았습니다.
+                    <br />11시 이후에 다시 확인해주세요!
+                </Typography>
+            </Container>
+        );
+    }
     if (items.length === 0) return <Typography align="center">데이터가 없습니다.</Typography>;
 
     const prevItem = () => setCurrentIndex((prev) => (prev === 0 ? items.length - 1 : prev - 1));

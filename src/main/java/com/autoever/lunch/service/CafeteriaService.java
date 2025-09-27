@@ -75,7 +75,7 @@ public class CafeteriaService {
     // ===================== 내부 로직 =====================
 
     private List<CafeteriaDto> doCrawl() {
-        String todayKor = LocalDate.now(KST).minusDays(1).format(KST_KOR_DATE);
+        String todayKor = LocalDate.now(KST).format(KST_KOR_DATE);
 
         WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
