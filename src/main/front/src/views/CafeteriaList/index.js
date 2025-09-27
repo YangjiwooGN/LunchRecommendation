@@ -20,7 +20,7 @@ export default function CafeteriaList() {
     const [loading, setLoading] = useState(true);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [modalImage, setModalImage] = useState(null);
-    const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:30080";
+    const API_BASE = process.env.REACT_APP_API_BASE;
 
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // ✅ 600px 이하
