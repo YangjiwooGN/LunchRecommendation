@@ -80,7 +80,7 @@ public class CafeteriaService {
     // ===================== 내부 로직 =====================
 
     private List<CafeteriaDto> doCrawl() {
-        String todayKor = LocalDate.now(KST).format(KST_KOR_DATE);
+        String todayKor = LocalDate.now(KST).minusDays(1).format(KST_KOR_DATE);
         log.info("📅 오늘 날짜 키워드 = {}", todayKor);
 
         WebDriverManager.chromedriver().setup();

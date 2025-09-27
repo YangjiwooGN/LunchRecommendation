@@ -65,10 +65,18 @@ export default function Navigation() {
                     <Button
                         variant="contained"
                         sx={naviButtonStyle}
-                        onClick={() => navigate("/ai")}
+                        onClick={() => navigate("/roulette")}
                     >
-                        AI
+                        룰렛 돌리기
                     </Button>
+                    <Button
+                        variant="contained"
+                        sx={naviButtonStyle}
+                        onClick={() => navigate("/ladder")}
+                    >
+                        사다리 타기
+                    </Button>
+                    
                 </Box>
             </Toolbar>
         </AppBar>
