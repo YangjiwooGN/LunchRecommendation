@@ -8,15 +8,15 @@ export default function Ladder() {
     const [ladder, setLadder] = useState([]);
     const [results, setResults] = useState([]);
 
-    // ✅ 1단계 - 인원 수 선택 완료
+    // 인원 수 선택 완료
     const handleStart = () => {
         setTopOptions(Array(playerCount).fill(""));
         setBottomOptions(Array(playerCount).fill(""));
         setStep(2);
     };
 
-    // ✅ 옵션 변경
-    const handleTopChange = (i, value) => {
+    // 옵션 변경
+    const handleTopChange  = (i, value) => {
         const copy = [...topOptions];
         copy[i] = value;
         setTopOptions(copy);
@@ -28,7 +28,7 @@ export default function Ladder() {
         setBottomOptions(copy);
     };
 
-    // ✅ 사다리 랜덤 생성 (자연스러운 버전)
+    // 사다리 랜덤 생성
     const generateLadder = () => {
         const rows = 12; // 총 줄 단계 (높이)
         const minGap = 1; // 같은 열에서는 최소 몇 줄 건너뛰고 다시 가로줄을 만들지
@@ -38,14 +38,14 @@ export default function Ladder() {
             .fill(null)
             .map(() => Array(playerCount - 1).fill(false));
 
-        // ✅ “간격 유지 + 연속 방지 + 고른 분포” 로직
+        // 간격 유지 + 연속 방지 + 고른 분포
         for (let c = 0; c < playerCount - 1; c++) {
             let lastRow = -minGap;
 
             for (let r = 0; r < rows; r++) {
-                // ✅ 1) 최소 간격 조건 충족 &
-                // ✅ 2) 인접 세로줄과 겹치지 않게 &
-                // ✅ 3) 전체적으로 고르게 배포되도록 조건 설정
+                // 1) 최소 간격 조건 충족 &
+                // 2) 인접 세로줄과 겹치지 않게 &
+                // 3) 전체적으로 고르게 배포되도록 조건 설정
                 if (
                     r - lastRow >= minGap + 1 && // 줄 간격 확보
                     Math.random() < 0.5 && // 확률 조절 (너무 많지 않게)
@@ -65,7 +65,7 @@ export default function Ladder() {
 
 
 
-    // ✅ 결과 계산
+    // 결과 계산
     const calculateResults = (ladder) => {
         const finalResults = [];
         for (let start = 0; start < playerCount; start++) {
@@ -82,7 +82,7 @@ export default function Ladder() {
         setResults(finalResults);
     };
 
-    // ✅ 사다리 화면 렌더링 (좌표/간격 문제 해결)
+    // 사다리 화면 렌더링
     const renderLadder = () => {
         const containerHeight = 400;
         const containerWidth = 400;
@@ -135,7 +135,7 @@ export default function Ladder() {
                     )
                 )}
 
-                {/* ✅ 위 옵션 */}
+                {/* 위 옵션 */}
                 {topOptions.map((opt, i) => (
                     <div
                         key={`top-${i}`}
@@ -152,7 +152,7 @@ export default function Ladder() {
                     </div>
                 ))}
 
-                {/* ✅ 아래 옵션 */}
+                {/* 아래 옵션 */}
                 {bottomOptions.map((opt, i) => (
                     <div
                         key={`bottom-${i}`}
@@ -171,7 +171,7 @@ export default function Ladder() {
         );
     };
 
-    // ✅ 1단계: 인원 수 선택
+    // 1단계: 인원 수 선택
     if (step === 1) {
         return (
             <div style={{ padding: 40, textAlign: "center" }}>
@@ -201,7 +201,7 @@ export default function Ladder() {
         );
     }
 
-    // ✅ 2단계: 옵션 입력
+    // 2단계: 옵션 입력
     if (step === 2) {
         return (
             <div style={{ padding: 40, textAlign: "center" }}>
@@ -225,7 +225,6 @@ export default function Ladder() {
                     ))}
                 </div>
 
-                {/* ✅ 사다리 기본 틀 (세로줄) */}
                 <div
                     style={{
                         position: "relative",
@@ -249,7 +248,6 @@ export default function Ladder() {
                     ))}
                 </div>
 
-                {/* ✅ 결과 입력 */}
                 <div style={{ display: "flex", justifyContent: "center", gap: 40, marginTop: 20 }}>
                     {Array.from({ length: playerCount }).map((_, i) => (
                         <input
@@ -267,7 +265,6 @@ export default function Ladder() {
                     ))}
                 </div>
 
-                {/* ✅ 버튼 영역 */}
                 <div style={{ marginTop: 40, display: "flex", justifyContent: "center", gap: 20 }}>
                     {/* 돌아가기 버튼 */}
                     <button
@@ -305,7 +302,7 @@ export default function Ladder() {
         );
     }
 
-    // ✅ 3단계: 결과 화면
+    // 3단계: 결과 화면
     if (step === 3) {
         return (
             <div style={{ padding: 40, textAlign: "center" }}>
@@ -331,7 +328,7 @@ export default function Ladder() {
         );
     }
 
-    // ✅ 4단계: 전체 결과 표시
+    // 4단계: 전체 결과 표시
     if (step === 4) {
         return (
             <div style={{ padding: 40, textAlign: "center" }}>

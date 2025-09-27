@@ -24,7 +24,7 @@ export default function CafeteriaList() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // ✅ 600px 이하
 
-    // ✅ 터치 시작 좌표 저장용
+    // 터치 시작 좌표 저장용
     const [touchStartX, setTouchStartX] = useState(null);
 
     useEffect(() => {
@@ -64,12 +64,12 @@ export default function CafeteriaList() {
 
     const current = items[currentIndex];
 
-    // ✅ 스와이프 시작 이벤트
+    // 스와이프 시작 이벤트
     const handleTouchStart = (e) => {
         setTouchStartX(e.touches[0].clientX);
     };
 
-    // ✅ 스와이프 종료 이벤트
+    // 스와이프 종료 이벤트
     const handleTouchEnd = (e) => {
         if (touchStartX === null) return;
 
@@ -103,7 +103,7 @@ export default function CafeteriaList() {
                     justifyContent: "center",
                     position: "relative",
                     gap: 2,
-                    touchAction: "pan-y", // ✅ 세로 스크롤과 충돌 방지
+                    touchAction: "pan-y", // 세로 스크롤과 충돌 방지
                 }}
                 onTouchStart={isMobile ? handleTouchStart : undefined}
                 onTouchEnd={isMobile ? handleTouchEnd : undefined}
@@ -115,7 +115,7 @@ export default function CafeteriaList() {
                     </IconButton>
                 )}
 
-                {/* ✅ 메인 카드 */}
+                {/* 메인 카드 */}
                 <Card
                     sx={{
                         width: isMobile ? "100%" : 500,
@@ -156,7 +156,7 @@ export default function CafeteriaList() {
                 )}
             </Box>
 
-            {/* ✅ 모바일 전용 하단 네비게이션 */}
+            {/* 모바일 전용 하단 네비게이션 */}
             {isMobile && (
                 <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
                     <Button onClick={prevItem} variant="outlined" startIcon={<ArrowBackIosNewIcon />}>
@@ -171,14 +171,14 @@ export default function CafeteriaList() {
                 </Box>
             )}
 
-            {/* ✅ 데스크탑 페이지 표시 */}
+            {/* 데스크탑 페이지 표시 */}
             {!isMobile && (
                 <Typography align="center" sx={{ mt: 2, color: "gray" }}>
                     {currentIndex + 1} / {items.length}
                 </Typography>
             )}
 
-            {/* ✅ 이미지 모달 */}
+            {/* 이미지 모달 */}
             <Dialog open={Boolean(modalImage)} onClose={() => setModalImage(null)} maxWidth="md">
                 <Box
                     component="img"

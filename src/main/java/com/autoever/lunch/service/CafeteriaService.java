@@ -40,17 +40,14 @@ public class CafeteriaService {
         LocalDate today = LocalDate.now(KST);
 
         if (cachedDate != null && cachedDate.equals(today) && !cached.isEmpty()) {
-            log.info("✅ 캐시 사용 ({}건, date={})", cached.size(), cachedDate);
             return Collections.unmodifiableList(cached);
         }
 
-        log.info("⚠️ 캐시 없음 → 즉시 크롤링 시도");
         List<CafeteriaDto> latest = doCrawl();
         if (!latest.isEmpty()) {
             cached.clear();
             cached.addAll(latest);
             cachedDate = today;
-            log.info("✅ 새 크롤링 성공 ({}건)", latest.size());
         } else {
             log.warn("❌ 크롤링 실패 → 빈 배열 반환");
         }
@@ -61,13 +58,11 @@ public class CafeteriaService {
     /** 매일 11시에 크롤링해서 캐시 저장 */
     @Scheduled(cron = "0 0 11 * * *", zone = "Asia/Seoul")
     public void scheduledCrawl() {
-        log.info("⏰ 11시 자동 크롤링 시작");
         List<CafeteriaDto> latest = doCrawl();
         if (!latest.isEmpty()) {
             cached.clear();
             cached.addAll(latest);
             cachedDate = LocalDate.now(KST);
-            log.info("✅ 캐시 저장 완료: {}건 (date={})", latest.size(), cachedDate);
         } else {
             log.warn("⚠️ 크롤링 결과 0건 (캐시 미갱신)");
         }
@@ -81,7 +76,6 @@ public class CafeteriaService {
 
     private List<CafeteriaDto> doCrawl() {
         String todayKor = LocalDate.now(KST).minusDays(1).format(KST_KOR_DATE);
-        log.info("📅 오늘 날짜 키워드 = {}", todayKor);
 
         WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
@@ -96,20 +90,13 @@ public class CafeteriaService {
 
             String targetUrl = findTodayPostUrl(driver, todayKor);
             if (targetUrl == null) {
-                log.warn("⚠️ 오늘자 '가디 구내식당 메뉴' 글을 찾지 못함");
                 return Collections.emptyList();
             }
-            log.info("🔗 대상 글 URL: {}", targetUrl);
 
             List<CafeteriaDto> items = parseCafeteriasFromPost(driver, targetUrl);
-            log.info("📦 추출 완료: {}건", items.size());
             return items;
 
-        } catch (TimeoutException te) {
-            log.warn("⏳ 목록 대기 타임아웃: {}", te.getMessage());
-            return Collections.emptyList();
         } catch (Exception e) {
-            log.error("❌ 크롤링 중 예외", e);
             return Collections.emptyList();
         } finally {
             try { driver.quit(); } catch (Exception ignore) {}
@@ -154,11 +141,8 @@ public class CafeteriaService {
             }
         }
 
-        log.info("🧭 후보 글 수집: {}건", urls.size());
-
         for (int i = 0; i < urls.size(); i++) {
             String title = titles.get(i);
-            log.debug("  - 후보: {}", title);
             if (title.contains("가디 구내식당 메뉴") && title.contains(todayKor)) {
                 return urls.get(i);
             }
@@ -175,13 +159,10 @@ public class CafeteriaService {
             wait.until(ExpectedConditions.presenceOfElementLocated(
                     By.cssSelector(".se-viewer, .se_component_wrap")));
         } catch (TimeoutException te) {
-            log.warn("⏳ 본문 로드 타임아웃: {}", te.getMessage());
         }
 
         List<WebElement> blocks = driver.findElements(By.cssSelector(
                 "div.se-viewer .se-component, div.se_component_wrap .se-component, .se-component"));
-
-        log.info("🧩 본문 블록 수: {}", blocks.size());
 
         CafeteriaDto lastDto = null;
 
@@ -191,14 +172,10 @@ public class CafeteriaService {
             // ✅ 바뀐 부분: 이미지 추출 로직 개선
             String firstImg = findNearbyImage(blocks, i);
 
-            log.debug("블록[{}] => {} {}", i, text.replace("\n", " / "),
-                    firstImg != null ? "[img]" : "");
-
             if (isRestaurantBlock(text)) {
                 CafeteriaDto dto = parseRestaurantLine(text, firstImg, targetUrl);
                 out.add(dto);
                 lastDto = dto;
-                log.info("✅ 메뉴 등록: {} | img={}", dto.getName(), firstImg);
                 continue;
             }
 
@@ -206,7 +183,6 @@ public class CafeteriaService {
                 if (lastDto != null && (lastDto.getAddress() == null || lastDto.getAddress().isBlank())) {
                     String cleanedAddr = cleanAddress(text);
                     lastDto.setAddress(cleanedAddr);
-                    log.info("📍 주소 매핑: {} -> {}", lastDto.getName(), cleanedAddr);
                 }
             }
         }
@@ -219,7 +195,7 @@ public class CafeteriaService {
         String img = extractImage(blocks.get(index));
         if (img != null) return img;
 
-        // ✅ 다음 블록 먼저 검사 (메뉴 사진이 뒤에 오는 경우가 많음)
+        // 다음 블록 먼저 검사 (메뉴 사진이 뒤에 오는 경우가 많음)
         if (index + 1 < blocks.size()) {
             img = extractImage(blocks.get(index + 1));
             if (img != null) return img;
