@@ -1,0 +1,85 @@
+name: Build & Push (Docker Hub) & Update GitOps
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch: {}
+
+env:
+  IMAGE_BACKEND: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/lunch-backend
+  IMAGE_FRONTEND: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/lunch-frontend
+  GITOPS_REPO: ${{ secrets.GITOPS_REPO }}
+  KUSTOMIZE_PATH: base
+
+jobs:
+  build-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build & Push backend
+        run: |
+          docker build -f Dockerfile.backend -t $IMAGE_BACKEND:${{ github.sha }} .
+          docker tag  $IMAGE_BACKEND:${{ github.sha }} $IMAGE_BACKEND:latest
+          docker push $IMAGE_BACKEND:${{ github.sha }}
+          docker push $IMAGE_BACKEND:latest
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build & Push frontend
+        run: |
+          docker build -f Dockerfile.frontend \
+            --build-arg REACT_APP_API_BASE="${{ secrets.REACT_APP_API_BASE || '/api' }}" \
+            -t $IMAGE_FRONTEND:${{ github.sha }} .
+          docker tag  $IMAGE_FRONTEND:${{ github.sha }} $IMAGE_FRONTEND:latest
+          docker push $IMAGE_FRONTEND:${{ github.sha }}
+          docker push $IMAGE_FRONTEND:latest
+
+  update-gitops:
+    needs: [build-backend, build-frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone gitops repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.GITOPS_REPO }}
+          token: ${{ secrets.GITOPS_TOKEN }}
+          path: gitops
+
+      - name: Install yq
+        run: sudo apt-get update && sudo apt-get install -y yq
+
+      - name: Update image tags in kustomization.yaml
+        env:
+          IMAGE_BACKEND: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/lunch-backend
+          IMAGE_FRONTEND: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/lunch-frontend
+        run: |
+          cd gitops/${{ env.KUSTOMIZE_PATH }}
+          yq -i '.images[] |= select(.name == env.IMAGE_BACKEND).newTag = env.GITHUB_SHA' kustomization.yaml
+          yq -i '.images[] |= select(.name == env.IMAGE_FRONTEND).newTag = env.GITHUB_SHA' kustomization.yaml
+
+      - name: Commit & push
+        run: |
+          cd gitops
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add -A
+          git commit -m "Update images to $GITHUB_SHA" || echo "No changes"
+          git push
