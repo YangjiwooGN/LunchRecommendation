@@ -43,7 +43,7 @@ export default function Navigation() {
             <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
                 {/* 왼쪽 로고 */}
                 <IconButton onClick={() => navigate("/")} sx={{ p: 0 }}>
-                    <img src="/navigation_logo.png" alt="뭐먹지 로고" style={{ width: 100, height: 70 }} />
+                    <img src="/navigation_logo.png" alt="뭐먹지 로고" style={{ width: 130, height: 85 }} />
                 </IconButton>
 
                 {/* 데스크탑 메뉴 */}

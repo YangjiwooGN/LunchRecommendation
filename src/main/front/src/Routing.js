@@ -8,7 +8,7 @@ import Ladder from "./views/Ladder";
 export default function Routing(){
     return (
         <div>
-            <div style={{ marginTop: '100px' }}>
+            <div style={{ marginTop: '85px' }}>
                 <Routes>
                     <Route path='/' element={<ProjectMain/>} />
                     <Route path='/cafeteria' element={<CafeteriaList/>} />
