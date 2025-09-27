@@ -78,8 +78,16 @@ public class CafeteriaService {
         String todayKor = LocalDate.now(KST).format(KST_KOR_DATE);
 
         WebDriverManager.chromedriver().setup();
+        System.setProperty("webdriver.chrome.whitelistedIps", "");
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless=new", "--no-sandbox", "--disable-dev-shm-usage");
+        options.addArguments(
+                "--headless=new",
+                "--no-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-gpu",
+                "--remote-allow-origins=*",
+                "--window-size=1920,1080"
+        );
         WebDriver driver = new ChromeDriver(options);
 
         try {
