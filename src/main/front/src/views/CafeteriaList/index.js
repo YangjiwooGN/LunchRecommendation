@@ -42,7 +42,8 @@ export default function CafeteriaList() {
                 const priorityNames = [
                     "에이스테크노타워10차 구내식당 더푸드스케치",
                     "가산DK테라타워 구내식당 아이밀",
-                    "어반워크 구내식당 다시봄"
+                    "어반워크 구내식당 다시봄", 
+                    "어반워크2 구내식당 밥(온)"
                 ];
 
                 const priorityItems = priorityNames
