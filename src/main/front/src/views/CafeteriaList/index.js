@@ -76,7 +76,7 @@ export default function CafeteriaList() {
         return (
             <Container maxWidth="sm" sx={{ py: 10, textAlign: "center" }}>
                 <Typography variant="h4" fontWeight="bold" gutterBottom>
-                    🍱 일 오전 11시에 최신화됩니다
+                    🍱 평일 오전 11시에 최신화됩니다
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
                     현재는 식당 데이터가 준비되지 않았습니다.
