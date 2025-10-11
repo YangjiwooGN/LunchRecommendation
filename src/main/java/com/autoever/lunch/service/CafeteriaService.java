@@ -60,7 +60,7 @@ public class CafeteriaService {
     }
 
     /** 매일 11시에 크롤링해서 캐시 저장 */
-    @Scheduled(cron = "0 0 11 * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0 11 * * MON-FRI", zone = "Asia/Seoul")
     public void scheduledCrawl() {
         List<CafeteriaDto> latest = doCrawl();
         if (!latest.isEmpty()) {
